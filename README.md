@@ -27,7 +27,7 @@ The basic logic of flowlet switching is as follows:
 5. Consider whether or not to modify the controller code.
 
 ## Hints
-* You can use registers in P4 to store timestamps; below is an example: 
+* You can use registers in P4 to implement hash table; below is an example: 
     ```
     struct metadata {
         bit<48> interval;
