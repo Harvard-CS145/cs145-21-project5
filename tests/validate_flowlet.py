@@ -26,7 +26,7 @@ for i in range(4):
             contents = f.read()
             d.append(len(contents))
 
-    print(d)
+    print("# of packets on the four links"+d)
     
     # If the flowlet switching works, the deviation of the 4 numbers should be small
     avg = 0.0
@@ -39,7 +39,7 @@ for i in range(4):
     dev /= len(d)
     dev = math.sqrt(dev)
     dev = dev / avg
-    print(dev)
+    print("stddev of four links"+dev)
 
     if abs(dev) > 0.3:
         print("Test fail")

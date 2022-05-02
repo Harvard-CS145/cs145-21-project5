@@ -7,7 +7,8 @@
 
 ## Getting Started
 
-Project 5 will inherit your `p4src/l3fwd.p4`, `topology/p4app_fat.json` (Fattree with k=4), and `controller/controller_fat_l3.py` files from project 3.
+- Project 5 will inherit your `p4src/l3fwd.p4`, `topology/p4app_fat.json` (Fattree with k=4), and `controller/controller_fat_l3.py` files from project 3.
+- We encourage you to revisit `p4_explanation.md` in project 3 for references if you incur P4 related questions in this project.
 
 ## Introduction
 
@@ -78,22 +79,46 @@ Run `sudo python3 tests/validate_flowlet.py`. The script will send one flow inte
 
 ## Part Two: Compare Performance
 
-In this part, you are expected to compare the performance of the ECMP algorithm before and after using flowlet switching. You will use a specific trace named `apps/trace/flowlet.trace` (generated using `python apps/trace/generate_trace.py --mchost=1-16 --iperfhost=1-16 --length=60 --file=apps/trace/flowlet.trace`), which consists of persistent flows, while each flow is comprised of many small flowlets. Please proceed with the following steps:
+In this part, you are expected to compare the performance of the ECMP algorithm before and after using flowlet switching. You will use a specific trace named `apps/trace/flowlet.trace` (generated using `python apps/trace/generate_trace.py --iperfhost=1-16 --length=60 --mode=iperf --fgmode=perflow --gapdist=uniform --file=apps/trace/flowlet.trace`), which consists of persistent flows, while each flow is comprised of many small flowlets. Please proceed with the following steps:
 
-1. Run ECMP algorithm without flowlet switching. Run your codes in project 3 (ie, `sudo p4run --conf topology/p4app_fat.json` to run your `p4src/l3fwd.p4`, then start your controller by `python controller/controller_fat_l3.py`), and use `apps/send_traffic.py` script to send the traffic. 
+1. Run ECMP algorithm without flowlet switching. Run your codes in project 3:
+   
+   (1) Run your `p4src/l3fwd.p4`
+   ```
+   sudo p4run --conf topology/p4app_fat.json
+   ```
+   
+   (2) Start your controller 
+   ```
+   python controller/controller_fat_l3.py
+   ```   
+   (3) Send the traffic. 
     ```
     sudo python ./apps/send_traffic.py ./apps/trace/flowlet.trace 1-16 60 ecmp_logs
     ```
-    You can check out the iperf throughput values from `ecmp_logs` directory: each float value in `ecmp/\*_iperf.log' is the throughput (unit is bps) for a specific flow. 
-2. Run ECMP algorithm with flowlet switching in the current project (ie, `sudo p4run --conf topology/p4app_fat_flowlet.json` to run your `p4src/flowlet_switching.p4`, then start your controller by `python controller/controller_flowlet.py`). Use `apps/send_traffic.py` to send the traffic. 
+   (4) You can check out the iperf throughput values from `ecmp_logs` directory: each float value in `ecmp/\*_iperf.log' is the throughput (unit is bps) for a specific flow. 
+
+2. Run ECMP algorithm with flowlet switching in the current project:
+   (1) Run your `p4src/flowlet_switching.p4`
+   ```
+   sudo p4run --conf topology/p4app_fat_flowlet.json
+   ```
+   (2) Start your controller
+   ```
+   python controller/controller_flowlet.py
+   ```
+   (3) Send the traffic. 
     ```
     sudo python ./apps/send_traffic.py ./apps/trace/flowlet.trace 1-16 60 flowlet_logs
     ```
-    You can check out the iperf throughput values of this run from `flowlet_logs` directory.
-3. Draw CDF figures of iperf throughputs for both step 1 and step 2.
+   (4) You can check out the iperf throughput values of this run from `flowlet_logs` directory.
+
+3. Draw CDF (cumulative distribution function) figures of iperf throughput for both step 1 and step 2. In a CDF figure: the x-axis is the iperf throughpout, and the y-axis is the portion of flows that achieve less than or equal to that throughput. 
+
 4. Use pcap files to gather the following information:
-    - Find out the largest flow in the traffic.
-    - There are four paths for each flowlet to choose in our topology. Within the largest flow, each flowlet could choose a different path. What's the percentage of flowlets of the largest flow on each of the four paths?
+   (1) Find out the largest flow in the traffic.
+   (2) Identify all the flowlets in this large flow. You can identify the flowlets based on five tuples and packet timestamps.
+   (3) Identify the paths these flowlet takes. What's the percentage of flowlets of the largest flow on each of the four paths?
 
 ### Parsing Pcap Files
 
@@ -113,10 +138,10 @@ Then you can get a human-readable file `res.txt` containing the information of e
 
 Each field represents timestamp, src MAC address, dst MAC address, ethernet type, packet size, src IP address/TCP port, dst IP address/TCP port, TCP flags, sequence number, ACK number, etc.
 
-For more information about pcap, please refer to [Pcap for Tcpdump page](https://www.tcpdump.org/pcap.html).
+For more information about pcap, please refer to [pcap for Tcpdump page](https://www.tcpdump.org/pcap.html).
 
 **Note**: 
-- To get reliable performance numbers for this experiment (and all future experiments that need to measure throughput and latency), you'd better check your VM CPU usage and ensure it's low. You can get reduce CPU usage by removing unnecessarily running applications in your VM.
+- To get reliable performance numbers for this experiment (and all future experiments that need to measure throughput and latency), you'd better check your VM CPU usage and ensure it's low. You can reduce CPU usage by terminating unnecessarily running applications in your VM and your computer.
 
 ## Extra Credit 
 
